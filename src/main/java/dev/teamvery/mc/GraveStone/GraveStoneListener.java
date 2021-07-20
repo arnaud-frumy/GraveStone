@@ -18,6 +18,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
+import org.bukkit.inventory.meta.Repairable;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
@@ -141,12 +142,17 @@ public class GraveStoneListener implements Listener {
                     lore.add(Component.text("X : " + compass.getX()));
                     lore.add(Component.text("Y : " + compass.getY()));
                     lore.add(Component.text("Z : " + compass.getZ()));
+                    lore.add(Component.text(" "));
+                    lore.add(Component.text(ChatColor.RED + "경고! 나침반의 이름을 바꾸면 무덤을 열 수 없습니다"));
 
                     ItemStack tmp = new ItemStack(Material.COMPASS);
                     CompassMeta trackercompass = (CompassMeta) tmp.getItemMeta();
 
                     trackercompass.setLodestoneTracked(false);
                     trackercompass.setLodestone(compass);
+                    if (trackercompass instanceof Repairable repairable) {
+                        repairable.setRepairCost(2000000000);
+                    }
                     trackercompass.displayName(Component.text(ChatColor.RED + "무덤 위치" + ChatColor.BLACK + " " + randomCode));
 
                     trackercompass.lore(lore);
