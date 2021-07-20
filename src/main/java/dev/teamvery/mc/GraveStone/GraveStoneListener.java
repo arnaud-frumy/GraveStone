@@ -35,7 +35,7 @@ public class GraveStoneListener implements Listener {
     private int tmp = 0;
     private int tmpCount = 0;
 
-    private void createChest(PlayerDeathEvent e, Block getBlock, ItemStack[] items) {
+    private void createChest(PlayerDeathEvent e, Block getBlock, List<ItemStack> items) {
         getBlock.setType(Material.CHEST);
 
         randomCode = random.nextInt(9999);
@@ -75,7 +75,7 @@ public class GraveStoneListener implements Listener {
     void GraveStoneSpawn(PlayerDeathEvent e) {
         create = false;
 
-        var items = e.getEntity().getInventory().getContents();
+        var items = e.getDrops().stream().toList();
         var deathLocate = e.getEntity().getLocation();
         var getBlock = deathLocate.getBlock();
 
@@ -190,7 +190,7 @@ public class GraveStoneListener implements Listener {
                                             public void run() {
                                                 int tmpItem;
 
-                                                for (tmpItem = 0; tmpItem <= 35; tmpItem++) {
+                                                for (tmpItem = 0; tmpItem <= 40; tmpItem++) {
                                                     try {
                                                         loc.getWorld().dropItem(loc, Objects.requireNonNull(i().getItemStack(chestCode + "." + tmpItem)));
 
