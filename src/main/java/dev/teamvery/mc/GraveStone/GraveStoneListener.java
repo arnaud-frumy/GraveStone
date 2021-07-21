@@ -35,6 +35,8 @@ public class GraveStoneListener implements Listener {
     private int tmp = 0;
     private int tmpCount = 0;
 
+    private List<ItemStack> compassItemStack = new ArrayList<>();
+
     private void createChest(PlayerDeathEvent e, Block getBlock, List<ItemStack> items) {
         getBlock.setType(Material.CHEST);
 
@@ -75,12 +77,22 @@ public class GraveStoneListener implements Listener {
     void GraveStoneSpawn(PlayerDeathEvent e) {
         create = false;
 
-        var items = e.getDrops().stream().toList();
+//        var items = e.getDrops().stream().toList();
+        var items = new ArrayList<ItemStack>();
         var deathLocate = e.getEntity().getLocation();
         var getBlock = deathLocate.getBlock();
 
         if (!e.getEntity().getInventory().isEmpty()) {
-            if ((!deathLocate.getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY)) || (!e.getDrops().isEmpty())) {
+
+            for (var i : e.getDrops().stream().toList()) {
+                if (i.getType().equals(Material.COMPASS) && String.valueOf(i.getItemMeta().displayName()).contains(ChatColor.RED + "무덤 위치")) {
+                    compassItemStack.add(i);
+                } else {
+                    items.add(i);
+                }
+            }
+
+            if ((!deathLocate.getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY)) && (!items.isEmpty())) {
 
                 e.getDrops().clear();
                 if (getBlock.getType().equals(Material.AIR)) {
@@ -90,6 +102,7 @@ public class GraveStoneListener implements Listener {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
+
                             if (deathLocate.getY() <= 0) {
                                 deathLocate.setY(10);
                                 var getBlockUp = deathLocate.getBlock();
@@ -116,6 +129,8 @@ public class GraveStoneListener implements Listener {
                         }
                     }.runTaskLater(Objects.requireNonNull(Bukkit.getPluginManager().getPlugin(plugin_name)), 0);
                 }
+            } else {
+                e.getDrops().clear();
             }
         }
     }
@@ -123,9 +138,13 @@ public class GraveStoneListener implements Listener {
     @EventHandler
     void BreakDisable(BlockBreakEvent e) {
         if (e.getBlock().getState() instanceof Chest chest) {
-            if (Objects.requireNonNull(chest.getCustomName()).contains("님의 무덤")) {
-                e.setCancelled(true);
-                e.getPlayer().sendMessage(ChatColor.RED + "무덤을 부술 수 없습니다");
+            try {
+                if (Objects.requireNonNull(chest.getCustomName()).contains("님의 무덤")) {
+                    e.setCancelled(true);
+                    e.getPlayer().sendMessage(ChatColor.RED + "무덤을 부술 수 없습니다");
+                }
+            } catch (NullPointerException error) {
+                e.setCancelled(false);
             }
         }
     }
@@ -160,6 +179,13 @@ public class GraveStoneListener implements Listener {
                     tmp.setItemMeta(trackercompass);
 
                     e.getPlayer().getInventory().addItem(tmp);
+                }
+
+                if (compassItemStack != null) {
+                    for (ItemStack i : compassItemStack) {
+                        e.getPlayer().getInventory().addItem(i);
+                    }
+                    compassItemStack.clear();
                 }
             }
         }.runTaskLater(Objects.requireNonNull(Bukkit.getPluginManager().getPlugin(plugin_name)), 0);
