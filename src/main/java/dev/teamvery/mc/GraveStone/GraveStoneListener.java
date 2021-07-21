@@ -34,6 +34,7 @@ public class GraveStoneListener implements Listener {
     private int randomCode = 0;
     private int tmp = 0;
     private int tmpCount = 0;
+    private int tmpSneak = 0;
 
     private List<ItemStack> compassItemStack = new ArrayList<>();
 
@@ -267,13 +268,13 @@ public class GraveStoneListener implements Listener {
                 e.getPlayer().sendMessage(ChatColor.RED + "무덤 위치 나침반은 버릴 수 없습니다");
 
             } else {
-                if (tmp == 2) {
+                if (tmpSneak >= 2) {
                     e.getItemDrop().remove();
-                    tmp = 0;
+                    tmpSneak = 0;
                 } else {
                     e.setCancelled(true);
                     e.getPlayer().sendMessage(ChatColor.RED + "무덤 위치 나침반을 버리려면 두 번더 눌러주세요");
-                    tmp++;
+                    tmpSneak++;
                 }
             }
         }
